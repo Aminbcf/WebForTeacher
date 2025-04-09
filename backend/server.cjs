@@ -59,31 +59,32 @@ app.get('/api/patients', async (req, res) => {
 
 app.post('/api/patients', async (req, res) => {
     try {
-        const { name, age, gender, location, severity, bodyPart, description, requiredAction, doctor } = req.body
+        const { name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor } = req.body;
+
         const [result] = await pool.query(
-            'INSERT INTO patients (name, age, gender, location, severity, bodyPart, description, requiredAction, doctor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE',
-            [name, age, gender, location, severity, bodyPart, description, requiredAction, doctor]
-        )
-        res.status(201).json({ id: result.insertId })
+            'INSERT INTO patients (name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor]
+        );
+        res.status(201).json({ id: result.insertId });
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        res.status(500).json({ error: error.message });
     }
-})
+});
 
 app.put('/api/patients/:id', async (req, res) => {
     try {
-        const { id } = req.params
-        const { name, age, gender, location, severity, bodyPart, description, requiredAction } = req.body
-        await pool.query(
-            'UPDATE patients SET name=?, age=?, gender=?, location=?, severity=?, bodyPart=?, description=?, requiredAction=? WHERE id=?',
-            [name, age, gender, location, severity, bodyPart, description, requiredAction, id]
-        )
-        res.status(200).json({ message: 'Patient updated' })
-    } catch (error) {
-        res.status(500).json({ error: error.message })
-    }
-})
+        const { id } = req.params;
+        const { name, age, gender, time, location, severity, bodyPart, description, requiredAction } = req.body;
 
+        await pool.query(
+            'UPDATE patients SET name=?, age=?, gender=?, time=?, location=?, severity=?, bodyPart=?, description=?, requiredAction=? WHERE id=?',
+            [name, age, gender, time, location, severity, bodyPart, description, requiredAction, id]
+        );
+        res.status(200).json({ message: 'Patient updated' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
 app.delete('/api/patients/:id', async (req, res) => {
     try {
         const { id } = req.params

@@ -1,9 +1,6 @@
 <script setup>
-import { ref } from 'vue';
-import axios from "axios" ;
-
-console.log("ieeee")
-
+import { ref, watch } from 'vue';
+import axios from "axios";
 
 const patient = ref({
   id: '',
@@ -18,32 +15,81 @@ const patient = ref({
   requiredAction: ''
 });
 
-const test = defineProps(['patient']);
-patient.value = test.patient;
+const props = defineProps(['patient']);
+
+// Watch for changes in the prop and format the time
+watch(() => props.patient, (newPatient) => {
+  if (newPatient && newPatient.id) {
+    patient.value = { ...newPatient };
+
+    // Format the time for datetime-local input
+    if (patient.value.time) {
+      // Remove seconds and milliseconds if present
+      patient.value.time = patient.value.time.split('.')[0].slice(0, 16);
+    }
+  } else {
+    // Reset to empty form for new patient
+    patient.value = {
+      id: '',
+      name: '',
+      age: '',
+      gender: 'Male',
+      time: new Date().toISOString().slice(0, 16), // Default to current time
+      location: '',
+      severity: 'Mild',
+      bodyPart: 'Head',
+      description: '',
+      requiredAction: ''
+    };
+  }
+}, { immediate: true });
+
 // Handle form submission
-const handleSubmit = (event) => {
+const handleSubmit = async (event) => {
+  event.preventDefault();
 
-  console.log('Patient data submitted:', patient.value);
-  axios.post(`http://localhost:3000/api/patients/`, {
-    name: patient.value.name,
-    age: patient.value.age,
-    gender: patient.value.gender,
-    time: patient.value.time,
-    location: patient.value.location,
-    severity: patient.value.severity,
-    bodyPart: patient.value.bodyPart,
-    description: patient.value.description,
-    requiredAction: patient.value.requiredAction,
+  try {
+    // Prepare the patient data with properly formatted time
+    const patientData = {
+      ...patient.value,
+      time: patient.value.time || new Date().toISOString().slice(0, 16)
+    };
 
-  })
+    if (patientData.id) {
+      // Update existing patient
+      await axios.put(`http://localhost:3000/api/patients/${patientData.id}`, patientData);
+      console.log('Patient updated:', patientData);
+    } else {
+      // Create new patient
+      await axios.post(`http://localhost:3000/api/patients/`, patientData);
+      console.log('Patient created:', patientData);
+    }
 
+    // Reset form
+    patient.value = {
+      id: '',
+      name: '',
+      age: '',
+      gender: 'Male',
+      time: new Date().toISOString().slice(0, 16),
+      location: '',
+      severity: 'Mild',
+      bodyPart: 'Head',
+      description: '',
+      requiredAction: ''
+    };
+
+    window.location.reload();
+  } catch (error) {
+    console.error('Error saving patient:', error);
+  }
 };
 </script>
 
 <template>
   <div id="patientPanel">
-    <h1>Add Patient</h1>
-    <br>
+
+
     <form id="patientForm" @submit="handleSubmit" class="patient-form">
       <input type="hidden" v-model="patient.id">
 
@@ -63,17 +109,25 @@ const handleSubmit = (event) => {
           <select class="input" v-model="patient.gender" id="gender">
             <option value="Male">Male</option>
             <option value="Female">Female</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
         <div class="form-column">
           <label for="time">Time</label>
-          <input class="input" v-model="patient.time" type="datetime-local" id="time" required>
+          <input
+              class="input"
+              v-model="patient.time"
+              type="datetime-local"
+              id="time"
+              required
+              step="1"
+          >
         </div>
 
         <div class="form-column">
           <label for="location">Location</label>
-          <input class="input" v-model="patient.location" id="where" placeholder="Location" required>
+          <input class="input" v-model="patient.location" id="location" placeholder="Location" required>
         </div>
 
         <div class="form-column">
@@ -107,7 +161,9 @@ const handleSubmit = (event) => {
         </div>
 
         <div class="form-column full-width">
-          <button type="submit" class="button button-red">Save Patient</button>
+          <button type="submit" class="button button-red">
+            {{ patient.id ? 'Update' : 'Save' }} Patient
+          </button>
         </div>
       </div>
     </form>
@@ -124,15 +180,12 @@ const handleSubmit = (event) => {
   padding: 20px;
 }
 
-
 .form-row {
   display: flex;
   flex-wrap: wrap;
   gap: 30px;
   width: 100%;
-
 }
-
 
 .form-column {
   flex: 1;
@@ -163,6 +216,7 @@ button.button-red {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button.button-red:hover {
@@ -173,5 +227,11 @@ label {
   font-weight: bold;
   margin-bottom: 5px;
   display: block;
+}
+
+.debug-info {
+  color: #666;
+  font-size: 0.9em;
+  margin-bottom: 1em;
 }
 </style>
