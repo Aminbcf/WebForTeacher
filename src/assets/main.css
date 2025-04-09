@@ -1,0 +1,97 @@
+/* General body styling */
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #FAF5F1; /* White fog */
+  color: #292F36; /* Carbon gray */
+  margin: 0;
+  padding: 0;
+}
+
+
+.content {
+  margin-left: 200px;
+  padding: 20px;
+}
+
+.title {
+  color: #A41F13; /* Fresh red */
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-column {
+  flex: 1;
+  min-width: 200px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.input {
+  width: 100%;
+  padding: 8px;
+  margin: 4px 0;
+  border: 1px solid #E0DBD8; /* Light gray */
+  border-radius: 4px;
+}
+
+textarea.input {
+  resize: vertical;
+}
+
+.button {
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.button-red {
+  background-color: #A41F13; /* Fresh red */
+  color: white;
+}
+
+.button-red:hover {
+  background-color: #ff4d4d;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #F2F2F2;
+}
+
+.list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.list li {
+  background-color: #E0DBD8; /* Light gray */
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+}
