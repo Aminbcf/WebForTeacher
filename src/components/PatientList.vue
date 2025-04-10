@@ -174,6 +174,7 @@ function refreshPatients() {
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  width: 1100px;
 }
 
 .patient-table {
