@@ -36,7 +36,7 @@ async function initializeDB() {
         description TEXT,
         requiredAction TEXT,
         doctor VARCHAR(255),
-        createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        createdAt DATETIME  DEFAULT CURRENT_TIMESTAMP
       )
     `)
         console.log('Database initialized')
@@ -56,44 +56,95 @@ app.get('/api/patients', async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 })
-
+// Modified POST endpoint
 app.post('/api/patients', async (req, res) => {
     try {
         const { name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor } = req.body;
 
+        // Convert to MySQL datetime format (YYYY-MM-DD HH:MM:SS)
+        const mysqlTime = formatDateForMySQL(time);
+
         const [result] = await pool.query(
-            'INSERT INTO patients (name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [name, age, gender, time, location, severity, bodyPart, description, requiredAction, doctor]
+            'INSERT INTO patients SET ?',
+            {
+                name,
+                age,
+                gender,
+                time: mysqlTime,
+                location: location || null,
+                severity: severity || null,
+                bodyPart: bodyPart || null,
+                description: description || null,
+                requiredAction: requiredAction || null,
+                doctor: doctor || null
+            }
         );
         res.status(201).json({ id: result.insertId });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Database error:', {
+            inputData: req.body,
+            error: error.message,
+            sqlMessage: error.sqlMessage
+        });
+        res.status(500).json({
+            error: 'Failed to save patient',
+            details: error.sqlMessage || error.message
+        });
     }
 });
 
+// Helper function
+function formatDateForMySQL(dateString) {
+    const date = new Date(dateString);
+
+    // Manual formatting to ensure MySQL compatibility
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+// Do the SAME change for your PUT endpoint
 app.put('/api/patients/:id', async (req, res) => {
     try {
         const { id } = req.params;
         const { name, age, gender, time, location, severity, bodyPart, description, requiredAction } = req.body;
 
+        // Same conversion as above
+        const mysqlTime = new Date(time).toLocaleString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+        }).replace(/(\d+)\/(\d+)\/(\d+), (\d+:\d+:\d+)/, '$3-$1-$2 $4');
+
         await pool.query(
             'UPDATE patients SET name=?, age=?, gender=?, time=?, location=?, severity=?, bodyPart=?, description=?, requiredAction=? WHERE id=?',
-            [name, age, gender, time, location, severity, bodyPart, description, requiredAction, id]
+            [name, age, gender, mysqlTime, location, severity, bodyPart, description, requiredAction, id]
         );
         res.status(200).json({ message: 'Patient updated' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
-app.delete('/api/patients/:id', async (req, res) => {
+// Get all doctors (for dropdown)
+
+app.get('/api/doctors', async (req, res) => {
     try {
-        const { id } = req.params
-        await pool.query('DELETE FROM patients WHERE id=?', [id])
-        res.status(200).json({ message: 'Patient deleted' })
+        const [doctors] = await pool.query('SELECT id, email FROM doctors');
+        res.json(doctors);
     } catch (error) {
-        res.status(500).json({ error: error.message })
+        console.error('Error fetching doctors:', error);
+        res.status(500).json({ error: 'Failed to fetch doctors' });
     }
-})
+});
 
 const PORT = 3000
 app.listen(PORT, () => {

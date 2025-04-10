@@ -15,10 +15,12 @@ const props = defineProps({
 });
 
 function edit(patientToEdit) {
+  console.log("I am working");
   patient.value = { ...patientToEdit };
   console.log(patient.value);
   showeditpatient.value ++
   location.href="#"
+
 
 
 }

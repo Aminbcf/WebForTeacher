@@ -18,7 +18,7 @@ const fetchPatients = async () => {
     const response = await axios.get("http://localhost:3000/api/patients");
     patients.value = response.data;
   } catch (error) {
-    console.error("Error fetching patients:", error);
+    //console.error("Error fetching patients:", error);
   }
 };
 
