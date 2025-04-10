@@ -113,6 +113,7 @@ async function deletePatient(id) {
     console.error('Delete error:', error.response?.data || error.message)
     alert(`Delete failed: ${error.response?.data?.message || 'Server error'}`)
   }
+  window.location.reload()
 }
 
 

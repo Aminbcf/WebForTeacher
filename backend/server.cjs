@@ -145,7 +145,15 @@ app.get('/api/doctors', async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch doctors' });
     }
 });
-
+app.delete('/api/patients/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        await pool.query('DELETE FROM patients WHERE id=?', [id])
+        res.status(200).json({ message: 'Patient deleted' })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+});
 const PORT = 3000
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
