@@ -119,6 +119,7 @@ async function deletePatient(id) {
 
 function refreshPatients() {
   emit('refresh')
+  window.location.reload();
 }
 </script>
 
