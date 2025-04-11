@@ -138,7 +138,7 @@ app.put('/api/patients/:id', async (req, res) => {
 
 app.get('/api/doctors', async (req, res) => {
     try {
-        const [doctors] = await pool.query('SELECT id, email FROM doctors');
+        const [doctors] = await pool.query('SELECT * FROM doctors');
         res.json(doctors);
     } catch (error) {
         console.error('Error fetching doctors:', error);

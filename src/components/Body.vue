@@ -4,7 +4,9 @@ import AddPatient from "@/components/AddPatient.vue";
 import PatientList from "@/components/PatientList.vue";
 import Home from "@/components/Home.vue";
 
-const patient = ref({});
+
+
+const patient = ref([]);
 const showeditpatient = ref(0);
 const currentView = ref('home');
 const showWelcome = ref(true);
@@ -15,10 +17,12 @@ const props = defineProps({
   patients: {
     type: Array,
     required: true
-  }
+  },
+
 });
 
-const totalPatients = computed(() => props.patients.length);
+
+
 
 function edit(patientToEdit) {
   patient.value = { ...patientToEdit };
@@ -108,7 +112,7 @@ onMounted(() => {
               :is="currentView === 'home' ? Home :
                  currentView === 'add' ? AddPatient :
                  PatientList"
-              v-bind="currentView === 'home' ? { totalPatients } :
+              v-bind="currentView === 'home' ? {  patientList: patients  } :
                     currentView === 'add' ? { patient, key: showeditpatient } :
                     { patients }"
               v-on="currentView === 'list' ? { edit_patient: edit } : {}"
