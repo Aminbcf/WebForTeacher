@@ -1,5 +1,6 @@
 <template>
-  <div class="patient-list-container">
+  <div id="patientList" class="patient-list-container">
+    <h1>Patient List</h1>
     <div class="list-controls">
       <div class="search-container">
         <input
@@ -7,9 +8,6 @@
             v-model="search"
             placeholder="Search patients..."
         />
-        <button class="refresh-button" @click="refreshPatients">
-          Refresh List
-        </button>
       </div>
     </div>
 
@@ -29,7 +27,7 @@
         </thead>
         <tbody>
         <tr
-            v-for="patient in filteredPatients"
+            v-for="patient in filteredPatients.slice().reverse()"
             :key="patient.id"
             class="table-row"
         >

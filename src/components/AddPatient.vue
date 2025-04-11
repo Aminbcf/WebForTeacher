@@ -1,5 +1,5 @@
 <template>
-  <div class="patient-form-container">
+  <div id="patient-form" class="patient-form-container">
     <div class="form-card">
       <div class="form-header">
         <h1>{{ patient.id ? 'Update Patient' : 'Register New Patient' }}</h1>
@@ -283,10 +283,10 @@
 
 
 <style scoped>
+
 .patient-form-container {
-  padding: 2rem;
-
-
+  padding: 1.5rem;
+  width: 150%;
 }
 
 .form-card {
@@ -294,54 +294,56 @@
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  max-width: 100%;
 }
 
 .form-header {
   background: #a41f13;
   color: white;
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.5rem;
 }
 
 .form-header h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .patient-form {
-  padding: 2rem;
+  padding: 20px;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 0.5rem;
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .full-width {
-  grid-column: 1 / -1;
+  grid-column:  3/ 1;
 }
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
   font-weight: 500;
   color: #333;
+  font-size: 0.95rem;
 }
 
 input,
 select,
 textarea {
-  width: 80%;
-  padding: 0.75rem 1rem;
+  width: 50%;
+  padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: all 0.2s;
+  border-radius: 6px;
+  font-size: 0.95rem;
   background-color: #f8f8f8;
+  transition: all 0.2s;
 }
 
 input:focus,
@@ -349,40 +351,45 @@ select:focus,
 textarea:focus {
   outline: none;
   border-color: #a41f13;
-  box-shadow: 0 0 0 3px rgba(164, 31, 19, 0.1);
+  box-shadow: 0 0 0 2px rgba(164, 31, 19, 0.1);
   background-color: white;
 }
 
 select {
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right 1rem center;
+  background-position: right 0.75rem center;
   background-size: 1em;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+
 }
 
 textarea {
-  min-height: 120px;
+  min-height: 100px;
   resize: vertical;
 }
 
 .form-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 1rem;
 }
 
-.submit-button {
-  padding: 1rem;
-  background-color: #a41f13;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+.submit-button,
+.cancel-button {
+  padding: 0.75rem;
+  font-size: 0.95rem;
   font-weight: 500;
+  border-radius: 6px;
+  border: none;
   cursor: pointer;
   transition: all 0.2s;
   flex: 1;
+}
+
+.submit-button {
+  background-color: #a41f13;
+  color: white;
 }
 
 .submit-button:hover {
@@ -390,25 +397,21 @@ textarea {
 }
 
 .cancel-button {
-  padding: 1rem;
   background-color: #f0f0f0;
   color: #333;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  flex: 1;
 }
 
 .cancel-button:hover {
   background-color: #ddd;
 }
 
+#doctor {
+  width: 100%;
+}
+
 @media (max-width: 768px) {
   .patient-form {
-    padding: 1.5rem;
+    padding: 1rem;
   }
 
   .form-grid {
@@ -419,4 +422,5 @@ textarea {
     flex-direction: column;
   }
 }
+
 </style>

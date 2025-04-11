@@ -1,13 +1,11 @@
 <template>
   <div class="app-container">
-    <SideNav />
     <Body :patients="patients" @refresh-patients="fetchPatients" />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import SideNav from '@/components/SideNav.vue';
 import Body from '@/components/Body.vue';
 import axios from 'axios';
 
