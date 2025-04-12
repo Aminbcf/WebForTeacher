@@ -132,8 +132,9 @@ console.log(severeCases)
 <style scoped>
 .home-container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
+  margin-left: 100px;
   min-height: 100vh;
 }
 
@@ -166,7 +167,6 @@ h1 {
 
 .cards-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 

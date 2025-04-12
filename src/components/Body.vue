@@ -3,8 +3,7 @@ import { ref, onMounted, computed } from 'vue'
 import AddPatient from "@/components/AddPatient.vue";
 import PatientList from "@/components/PatientList.vue";
 import Home from "@/components/Home.vue";
-
-
+import DoctorManagement from "@/components/DoctorManegment.vue";
 
 const patient = ref([]);
 const showeditpatient = ref(0);
@@ -18,11 +17,7 @@ const props = defineProps({
     type: Array,
     required: true
   },
-
 });
-
-
-
 
 function edit(patientToEdit) {
   patient.value = { ...patientToEdit };
@@ -63,7 +58,6 @@ onMounted(() => {
 
 <template>
   <div id="wrapper" class="wrapper">
-
     <button
         class="hamburger"
         @click="toggleSidebar"
@@ -73,7 +67,6 @@ onMounted(() => {
       <span></span>
       <span></span>
     </button>
-
 
     <nav
         id="sidebar"
@@ -96,6 +89,10 @@ onMounted(() => {
           <span class="item-icon">📋</span>
           <span class="item-text" v-if="!sidebarCollapsed">Patient List</span>
         </a>
+        <a href="#" class="sidebar-item" @click.prevent="navigateTo('doctor')" :title="sidebarCollapsed ? 'Doctor Management' : ''">
+          <span class="item-icon">👩🏻‍⚕️</span>
+          <span class="item-text" v-if="!sidebarCollapsed">Doctor Management</span>
+        </a>
       </div>
     </nav>
 
@@ -104,17 +101,16 @@ onMounted(() => {
         class="content"
         :class="{ 'sidebar-collapsed': sidebarCollapsed }"
     >
-
-
       <div v-show="currentView !== 'welcome' || !showWelcome">
         <transition name="fade" mode="out-in">
           <component
-              :is="currentView === 'home' ? Home :
+              :is="currentView === 'home' ? Home  :
                  currentView === 'add' ? AddPatient :
-                 PatientList"
-              v-bind="currentView === 'home' ? {  patientList: patients  } :
-                    currentView === 'add' ? { patient, key: showeditpatient } :
-                    { patients }"
+                 currentView === 'list' ? PatientList :
+                 DoctorManagement"
+              v-bind="currentView === 'home' ? { patientList: patients } :
+                   currentView === 'add' ? { patient, key: showeditpatient } :
+                   currentView === 'list' ? { patients } : {}"
               v-on="currentView === 'list' ? { edit_patient: edit } : {}"
               :key="currentView"
           />
@@ -123,13 +119,14 @@ onMounted(() => {
     </main>
   </div>
 </template>
-
 <style scoped>
 .wrapper {
   display: flex;
   min-height: 100vh;
   font-family: 'Segoe UI', system-ui, sans-serif;
   position: relative;
+  justify-content: center;
+
 }
 
 

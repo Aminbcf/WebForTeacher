@@ -154,6 +154,83 @@ app.delete('/api/patients/:id', async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 });
+
+
+// Create doctors table if not exists
+async function initializeDoctorsTable() {
+    const conn = await pool.getConnection()
+    try {
+        await conn.query(`
+      CREATE TABLE IF NOT EXISTS doctors (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        specialization VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        phone VARCHAR(50) NOT NULL,
+        role VARCHAR(50) NOT NULL DEFAULT 'doctor',
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+        console.log('Doctors table initialized')
+    } finally {
+        conn.release()
+    }
+}
+
+initializeDoctorsTable()
+
+// Doctor CRUD endpoints
+app.post('/api/doctors', async (req, res) => {
+    try {
+        const { name, specialization, email, phone, role } = req.body
+        const [result] = await pool.query(
+            'INSERT INTO doctors SET ?',
+            { name, specialization, email, phone, role }
+        )
+        res.status(201).json({ id: result.insertId })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.get('/api/doctors', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM doctors')
+        res.json(rows)
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.put('/api/doctors/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, specialization, email, phone, role } = req.body
+        await pool.query(
+            'UPDATE doctors SET name=?, specialization=?, email=?, phone=?, role=? WHERE id=?',
+            [name, specialization, email, phone, role, id]
+        )
+        res.status(200).json({ message: 'Doctor updated' })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+app.delete('/api/doctors/:id', async (req, res) => {
+    try {
+        const { id } = req.params
+        await pool.query('DELETE FROM doctors WHERE id=?', [id])
+        res.status(200).json({ message: 'Doctor deleted' })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+
+
+
+
+
 const PORT = 3000
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`)
