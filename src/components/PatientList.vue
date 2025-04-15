@@ -9,7 +9,26 @@
             placeholder="Search patients..."
         />
       </div>
+
+      <div class="sort-container">
+        <label for="sortField">Sort by:</label>
+        <select id="sortField" v-model="sortField">
+          <option value="">None</option>
+          <option value="name">Name</option>
+          <option value="age">Age</option>
+          <option value="severity">Severity</option>
+          <option value="gender">Gender</option>
+          <option value="location">Location</option>
+        </select>
+
+        <label for="sortOrder">Order:</label>
+        <select id="sortOrder" v-model="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
     </div>
+
 
     <div class="table-container">
       <table class="patient-table">
@@ -27,7 +46,7 @@
         </thead>
         <tbody>
         <tr
-            v-for="patient in filteredPatients.slice().reverse()"
+            v-for="patient in filteredPatients.slice()"
             :key="patient.id"
             class="table-row"
         >
@@ -61,6 +80,12 @@
 import { ref, computed } from 'vue'
 import axios from 'axios'
 
+
+const sortField = ref('')
+const sortOrder = ref('asc')
+
+
+
 console.log("anything")
 
 const API_BASE = 'http://localhost:3000/api/patients'
@@ -77,16 +102,38 @@ const emit = defineEmits(['edit_patient', 'refresh'])
 const search = ref('')
 
 const filteredPatients = computed(() => {
-  if (!search.value) return props.patients
-  const searchTerm = search.value.toLowerCase()
-  return props.patients.filter(patient => {
-    return Object.entries(patient).some(([key, value]) => {
-      // Skip id and other non-searchable fields
-      if (['id', 'doctor'].includes(key)) return false
-      return String(value).toLowerCase().includes(searchTerm)
+  let result = [...props.patients]
+
+  // Filter by search input
+  if (search.value) {
+    const searchTerm = search.value.toLowerCase()
+    result = result.filter(patient => {
+      return Object.entries(patient).some(([key, value]) => {
+        if (['id', 'doctor'].includes(key)) return false
+        return String(value).toLowerCase().includes(searchTerm)
+      })
     })
-  })
+  }
+
+  // Sorting logic
+  if (sortField.value) {
+    result.sort((a, b) => {
+      let valA = a[sortField.value]
+      let valB = b[sortField.value]
+
+      // Normalize strings
+      if (typeof valA === 'string') valA = valA.toLowerCase()
+      if (typeof valB === 'string') valB = valB.toLowerCase()
+
+      if (valA < valB) return sortOrder.value === 'asc' ? -1 : 1
+      if (valA > valB) return sortOrder.value === 'asc' ? 1 : -1
+      return 0
+    })
+  }
+
+  return result
 })
+
 
 function getSeverityClass(severity) {
   if (!severity) return 'default'
@@ -249,6 +296,32 @@ function refreshPatients() {
   cursor: pointer;
   transition: all 0.2s;
 }
+
+
+.sort-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.sort-container label {
+  font-weight: 500;
+}
+
+.sort-container select {
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+
+
+
 
 .edit-button {
   background-color: #ff6d05;

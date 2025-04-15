@@ -52,13 +52,33 @@
 
     <!-- Doctors List -->
     <div class="doctors-list">
-      <div class="search-bar">
-        <input
-            v-model="searchQuery"
-            placeholder="Search doctors..."
-            @input="filterDoctors"
-        />
+      <div class="search-sort-bar">
+        <!-- Search Input -->
+        <div class="search-bar">
+          <input
+              v-model="searchQuery"
+              placeholder="Search doctors..."
+              @input="filterDoctors"
+          />
+        </div>
+
+        <!-- Sort Controls -->
+        <div class="sort-bar">
+          <label for="sortKey">Sort by:</label>
+          <select v-model="sortKey" id="sortKey" @change="sortDoctors">
+            <option value="">None</option>
+            <option value="name">Name</option>
+            <option value="specialization">Specialization</option>
+            <option value="email">Email</option>
+            <option value="role">Role</option>
+          </select>
+
+          <button @click="toggleSortOrder" class="sort-toggle">
+            {{ sortOrder === 'asc' ? '↑ Asc' : '↓ Desc' }}
+          </button>
+        </div>
       </div>
+
 
       <table>
         <thead>
@@ -152,19 +172,21 @@ const fetchDoctors = async () => {
 const filterDoctors = () => {
   if (!searchQuery.value) {
     filteredDoctors.value = [...doctors.value]
-    return
+  } else {
+    const query = searchQuery.value.toLowerCase()
+    filteredDoctors.value = doctors.value.filter(doctor => {
+      return (
+          doctor.name.toLowerCase().includes(query) ||
+          (doctor.specialization && doctor.specialization.toLowerCase().includes(query)) ||
+          (doctor.email && doctor.email.toLowerCase().includes(query)) ||
+          (doctor.role && doctor.role.toLowerCase().includes(query))
+      )
+    })
   }
 
-  const query = searchQuery.value.toLowerCase()
-  filteredDoctors.value = doctors.value.filter(doctor => {
-    return (
-        doctor.name.toLowerCase().includes(query) ||
-        (doctor.specialization && doctor.specialization.toLowerCase().includes(query)) ||
-        (doctor.email && doctor.email.toLowerCase().includes(query)) ||
-        (doctor.role && doctor.role.toLowerCase().includes(query))
-    )
-  })
+  sortDoctors()
 }
+
 
 // Edit doctor
 const editDoctor = (doctor) => {
@@ -223,6 +245,31 @@ const confirmDelete = (id) => {
   doctorToDelete.value = id;
   showDeleteModal.value = true;
 };
+
+const sortKey = ref('')
+const sortOrder = ref('asc')
+
+const sortDoctors = () => {
+  if (!sortKey.value) return
+
+  filteredDoctors.value.sort((a, b) => {
+    const aVal = (a[sortKey.value] || '').toString().toLowerCase()
+    const bVal = (b[sortKey.value] || '').toString().toLowerCase()
+
+    if (aVal < bVal) return sortOrder.value === 'asc' ? -1 : 1
+    if (aVal > bVal) return sortOrder.value === 'asc' ? 1 : -1
+    return 0
+  })
+}
+
+const toggleSortOrder = () => {
+  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
+  sortDoctors()
+}
+
+
+
+
 
 
 // Initialize
@@ -368,6 +415,49 @@ onMounted(fetchDoctors)
   outline: none;
   box-shadow: 0 0 0 3px rgba(164, 31, 19, 0.1);
 }
+
+
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin:10px;
+
+}
+
+.sort-bar label {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.sort-bar select {
+  padding: 8px 10px;
+  margin-left: 10px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.sort-toggle {
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.sort-toggle:hover {
+  background-color: #0056b3;
+}
+
+
+
+
 
 table {
   width: 100%;
