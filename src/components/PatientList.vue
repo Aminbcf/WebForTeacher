@@ -41,7 +41,7 @@
           <th>Severity</th>
           <th>Body Part</th>
           <th>Diagnosis</th>
-          <th>Actions</th>
+
         </tr>
         </thead>
         <tbody>
@@ -61,14 +61,7 @@
           </td>
           <td>{{ patient.bodyPart }}</td>
           <td>{{ patient.description }}</td>
-          <td class="action-buttons">
-            <button class="edit-button" @click="$emit('edit_patient', patient)">
-              Edit
-            </button>
-            <button class="delete-button" @click="deletePatient(patient.id)">
-              Delete
-            </button>
-          </td>
+
         </tr>
         </tbody>
       </table>
@@ -145,22 +138,6 @@ function getSeverityClass(severity) {
   }
 }
 
-async function deletePatient(id) {
-  if (!confirm('Are you sure you want to delete this patient?')) return
-
-  try {
-    const response = await axios.delete(`${API_BASE}/${id}`)
-    if (response.status === 200) {
-      emit('refresh')
-      alert('Patient deleted successfully')
-    }
-  } catch (error) {
-    console.error('Delete error:', error.response?.data || error.message)
-    alert(`Delete failed: ${error.response?.data?.message || 'Server error'}`)
-  }
-  window.location.reload()
-}
-
 
 function refreshPatients() {
   emit('refresh')
@@ -200,20 +177,6 @@ function refreshPatients() {
   box-shadow: 0 0 0 3px rgba(164, 31, 19, 0.1);
 }
 
-.refresh-button {
-  padding: 0.75rem 1.5rem;
-  background-color: #a41f13;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.refresh-button:hover {
-  background-color: #8c1711;
-}
 
 .table-container {
   background: white;
@@ -281,22 +244,6 @@ function refreshPatients() {
   color: #383d41;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.edit-button,
-.delete-button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
 
 .sort-container {
   display: flex;
@@ -323,24 +270,6 @@ function refreshPatients() {
 
 
 
-.edit-button {
-  background-color: #ff6d05;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #ff8b33;
-}
-
-.delete-button {
-  background-color: #dc3545;
-  color: white;
-}
-
-.delete-button:hover {
-  background-color: #e9606d;
-}
-
 @media (max-width: 1200px) {
   .patient-table {
     display: block;
@@ -353,14 +282,6 @@ function refreshPatients() {
     flex-direction: column;
   }
 
-  .refresh-button {
-    width: 100%;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
 
   .table-header th,
   .table-row td {

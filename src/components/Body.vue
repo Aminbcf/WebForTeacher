@@ -1,125 +1,91 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import AddPatient from "@/components/AddPatient.vue";
-import PatientList from "@/components/PatientList.vue";
-import Home from "@/components/Home.vue";
-import DoctorManagement from "@/components/DoctorManegment.vue";
+import { ref, onMounted } from 'vue'
+import AddPatient from "@/components/AddPatient.vue"
+import PatientList from "@/components/PatientList.vue"
 
-const patient = ref([]);
-const showeditpatient = ref(0);
-const currentView = ref('home');
-const showWelcome = ref(true);
-const sidebarCollapsed = ref(false);
-const isMobile = ref(false);
+const currentView = ref('list') // default to PatientList
+const patient = ref([])
+const showeditpatient = ref(0)
+const sidebarCollapsed = ref(false)
+const isMobile = ref(false)
 
 const props = defineProps({
   patients: {
     type: Array,
     required: true
   },
-});
+})
 
 function edit(patientToEdit) {
-  patient.value = { ...patientToEdit };
-  showeditpatient.value++;
-  currentView.value = 'add';
+  patient.value = { ...patientToEdit }
+  showeditpatient.value++
+  currentView.value = 'add'
 }
 
 function navigateTo(view) {
-  currentView.value = view;
-  if (isMobile.value) {
-    sidebarCollapsed.value = true;
-  }
+  currentView.value = view
+  if (isMobile.value) sidebarCollapsed.value = true
 }
 
 function toggleSidebar() {
-  sidebarCollapsed.value = !sidebarCollapsed.value;
+  sidebarCollapsed.value = !sidebarCollapsed.value
 }
 
 function checkMobile() {
-  isMobile.value = window.innerWidth <= 768;
-  if (isMobile.value) {
-    sidebarCollapsed.value = true;
-  }
+  isMobile.value = window.innerWidth <= 768
+  if (isMobile.value) sidebarCollapsed.value = true
 }
 
 onMounted(() => {
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
-
-  setTimeout(() => {
-    showWelcome.value = false;
-    if (currentView.value === 'welcome') {
-      currentView.value = 'home';
-    }
-  }, 3000);
-});
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
 </script>
+
+
 
 <template>
   <div id="wrapper" class="wrapper">
-    <button
-        class="hamburger"
-        @click="toggleSidebar"
-        :class="{ 'active': !sidebarCollapsed }"
-    >
-      <span></span>
-      <span></span>
-      <span></span>
+    <!-- Hamburger -->
+    <button class="hamburger" @click="toggleSidebar" :class="{ 'active': !sidebarCollapsed }">
+      <span></span><span></span><span></span>
     </button>
 
-    <nav
-        id="sidebar"
-        class="sidebar"
-        :class="{ 'collapsed': sidebarCollapsed, 'mobile': isMobile }"
-    >
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar" :class="{ 'collapsed': sidebarCollapsed, 'mobile': isMobile }">
       <div class="sidebar-header">
         <h1 class="sidebar-title" v-if="!sidebarCollapsed">Control Panel</h1>
       </div>
       <div class="sidebar-links">
-        <a href="#" class="sidebar-item" @click.prevent="navigateTo('home')" :title="sidebarCollapsed ? 'Home' : ''">
-          <span class="item-icon">🏠</span>
-          <span class="item-text" v-if="!sidebarCollapsed">Home</span>
-        </a>
-        <a href="#" class="sidebar-item" @click.prevent="navigateTo('add')" :title="sidebarCollapsed ? 'Add Patient' : ''">
-          <span class="item-icon">➕</span>
-          <span class="item-text" v-if="!sidebarCollapsed">Add Patient</span>
-        </a>
-        <a href="#" class="sidebar-item" @click.prevent="navigateTo('list')" :title="sidebarCollapsed ? 'Patient List' : ''">
+        <a href="#" class="sidebar-item" @click.prevent="navigateTo('list')" :title="sidebarCollapsed ? 'List' : ''">
           <span class="item-icon">📋</span>
           <span class="item-text" v-if="!sidebarCollapsed">Patient List</span>
         </a>
-        <a href="#" class="sidebar-item" @click.prevent="navigateTo('doctor')" :title="sidebarCollapsed ? 'Doctor Management' : ''">
-          <span class="item-icon">👩🏻‍⚕️</span>
-          <span class="item-text" v-if="!sidebarCollapsed">Doctor Management</span>
+        <a href="#" class="sidebar-item" @click.prevent="navigateTo('add')" :title="sidebarCollapsed ? 'Add' : ''">
+          <span class="item-icon">➕</span>
+          <span class="item-text" v-if="!sidebarCollapsed">Add Patient</span>
         </a>
+
       </div>
     </nav>
 
-    <main
-        id="content"
-        class="content"
-        :class="{ 'sidebar-collapsed': sidebarCollapsed }"
-    >
-      <div v-show="currentView !== 'welcome' || !showWelcome">
-        <transition name="fade" mode="out-in">
-          <component
-              :is="currentView === 'home' ? Home  :
-                 currentView === 'add' ? AddPatient :
-                 currentView === 'list' ? PatientList :
-                 DoctorManagement"
-              v-bind="currentView === 'home' ? { patientList: patients } :
-                   currentView === 'add' ? { patient, key: showeditpatient } :
-                   currentView === 'list' ? { patients } : {}"
-              v-on="currentView === 'list' ? { edit_patient: edit } : {}"
-              :key="currentView"
-          />
-        </transition>
-      </div>
+    <!-- Main Content -->
+    <main id="content" class="content" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+      <transition name="fade" mode="out-in">
+        <component
+            :is="currentView === 'add' ? AddPatient : PatientList"
+            v-bind="currentView === 'add'
+              ? { patient, key: showeditpatient }
+              : { patients }"
+            v-on="currentView === 'list' ? { edit_patient: edit } : {}"
+            :key="currentView"
+        />
+      </transition>
     </main>
   </div>
 </template>
-<style scoped>
+
+  <style scoped>
 .wrapper {
   display: flex;
   min-height: 100vh;
